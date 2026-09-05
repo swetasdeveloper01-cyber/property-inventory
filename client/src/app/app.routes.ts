@@ -10,7 +10,23 @@ export const routes: Routes = [
   {
     path: 'properties',
     loadComponent: () =>
-      import('./features/properties/properties-page').then((m) => m.PropertiesPage)
+      import('./features/properties/property-list-page/property-list-page').then(
+        (m) => m.PropertyListPage
+      )
+  },
+  {
+    path: 'properties/new',
+    loadComponent: () =>
+      import('./features/properties/property-form-page/property-form-page').then(
+        (m) => m.PropertyFormPage
+      )
+  },
+  {
+    path: 'properties/:id',
+    loadComponent: () =>
+      import('./features/properties/property-form-page/property-form-page').then(
+        (m) => m.PropertyFormPage
+      )
   },
   {
     path: 'contacts',

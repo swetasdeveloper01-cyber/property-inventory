@@ -58,11 +58,11 @@ Frontend structure:
 ```
 client/src/app/
   core/           # API config, models, HTTP services, ProblemDetails interceptor
-  features/       # dashboard / properties / contacts placeholders
-  shared/         # shared placeholder component
+  features/       # dashboard + properties UI; contacts placeholder
+  shared/         # shared utilities and placeholder component
 ```
 
-Typed API services mirror the backend controllers. Feature UIs are placeholders in this foundation slice.
+Typed API services mirror the backend controllers.
 
 ## Implemented API endpoints
 
@@ -136,4 +136,13 @@ Current ownership (`EffectiveTill = null`) is included because each acquisition 
 - Table columns: ID (truncated GUID + tooltip), Property Name, Asking Price, Owner, Date of Purchase (`d MMM yyyy`), Sold At Price (original currency), Sold At Price (USD)
 - Loading / empty / error + Retry states are handled in the page component
 
-> Property and Contact feature screens will follow in later frontend slices.
+### Property UI
+
+- `/properties` — paged list with filters (`name`, `address`, `minPrice`, `maxPrice`), Apply/Clear, Edit link
+- `/properties/new` — create form (name, address, price, currency, date of registration)
+- `/properties/:id` — edit form; loads by id; 404 if missing
+- Filters and pagination call `GET /api/properties` (no client-side full-dataset filtering)
+- Create uses `POST /api/properties`; update uses `PUT /api/properties/{id}` (backend records asking-price history when price/currency change — UI does not call the price-history API)
+- Ownership / price-history screens are not implemented yet (placeholders on the edit page)
+
+> Contact feature screens will follow in a later frontend slice.

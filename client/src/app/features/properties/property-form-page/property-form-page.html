@@ -1,0 +1,147 @@
+<section class="property-form-page">
+  <header class="page-header">
+    <div>
+      <h1>{{ isCreate() ? 'Add Property' : 'Edit Property' }}</h1>
+      <p class="lede">
+        @if (isCreate()) {
+          Create a property with its current asking price.
+        } @else if (propertyId()) {
+          Update property details and current asking price
+          <span class="muted">({{ formatShortId(propertyId()!) }})</span>.
+        }
+      </p>
+    </div>
+    <a class="secondary-button" routerLink="/properties">Back to list</a>
+  </header>
+
+  @if (loading()) {
+    <div class="state state-loading" role="status">Loading property…</div>
+  } @else if (loadError()) {
+    <div class="state state-error" role="alert">
+      <p>{{ loadError() }}</p>
+      <a class="secondary-button" routerLink="/properties">Back to list</a>
+    </div>
+  } @else {
+    @if (successMessage()) {
+      <div class="banner banner-success" role="status">{{ successMessage() }}</div>
+    }
+
+    @if (formError()) {
+      <div class="banner banner-error" role="alert">{{ formError() }}</div>
+    }
+
+    <form class="property-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="property-name">Property Name</label>
+        <input
+          id="property-name"
+          type="text"
+          formControlName="name"
+          maxlength="200"
+          autocomplete="off"
+          [attr.aria-invalid]="controlError('name') ? true : null"
+          [attr.aria-describedby]="controlError('name') ? 'property-name-error' : null"
+        />
+        @if (controlError('name'); as message) {
+          <p id="property-name-error" class="field-error">{{ message }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="property-address">Address</label>
+        <textarea
+          id="property-address"
+          formControlName="address"
+          rows="3"
+          maxlength="500"
+          [attr.aria-invalid]="controlError('address') ? true : null"
+          [attr.aria-describedby]="controlError('address') ? 'property-address-error' : null"
+        ></textarea>
+        @if (controlError('address'); as message) {
+          <p id="property-address-error" class="field-error">{{ message }}</p>
+        }
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="property-price">Price</label>
+          <input
+            id="property-price"
+            type="number"
+            formControlName="price"
+            min="0"
+            step="0.01"
+            [attr.aria-invalid]="controlError('price') ? true : null"
+            [attr.aria-describedby]="controlError('price') ? 'property-price-error' : null"
+          />
+          @if (controlError('price'); as message) {
+            <p id="property-price-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="property-currency">Currency</label>
+          <input
+            id="property-currency"
+            type="text"
+            formControlName="currency"
+            maxlength="3"
+            class="currency-input"
+            [attr.aria-invalid]="controlError('currency') ? true : null"
+            [attr.aria-describedby]="controlError('currency') ? 'property-currency-error' : null"
+          />
+          @if (controlError('currency'); as message) {
+            <p id="property-currency-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="property-registration">Date of Registration</label>
+          <input
+            id="property-registration"
+            type="date"
+            formControlName="dateOfRegistration"
+            [attr.aria-invalid]="controlError('dateOfRegistration') ? true : null"
+            [attr.aria-describedby]="
+              controlError('dateOfRegistration') ? 'property-registration-error' : null
+            "
+          />
+          @if (controlError('dateOfRegistration'); as message) {
+            <p id="property-registration-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+      </div>
+
+      <p class="hint">
+        Price and Currency are the current asking price. Ownership acquisition prices are managed
+        separately.
+      </p>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-button" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isCreate() ? 'Create' : 'Save' }}
+        </button>
+        <button type="button" class="secondary-button" (click)="cancel()" [disabled]="saving()">
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    @if (!isCreate()) {
+      <aside class="next-slice" aria-label="Related property features">
+        <h2>Related</h2>
+        <p class="muted">
+          Ownership history and asking-price history will be available in a later slice.
+        </p>
+        <ul>
+          <li>
+            <span class="placeholder-link" aria-disabled="true">Ownership history (coming soon)</span>
+          </li>
+          <li>
+            <span class="placeholder-link" aria-disabled="true">Price history (coming soon)</span>
+          </li>
+        </ul>
+      </aside>
+    }
+  }
+</section>

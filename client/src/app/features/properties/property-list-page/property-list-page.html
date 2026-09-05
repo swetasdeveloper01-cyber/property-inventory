@@ -1,0 +1,105 @@
+<section class="property-list">
+  <header class="page-header">
+    <div>
+      <h1>Properties</h1>
+      <p class="lede">Manage property inventory records and current asking prices.</p>
+    </div>
+    <a class="primary-button" routerLink="/properties/new">Add Property</a>
+  </header>
+
+  @if (successMessage()) {
+    <div class="banner banner-success" role="status">
+      <span>{{ successMessage() }}</span>
+      <button type="button" class="link-button" (click)="dismissSuccess()">Dismiss</button>
+    </div>
+  }
+
+  <form class="filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <div class="field">
+      <label for="filter-name">Name</label>
+      <input id="filter-name" type="text" formControlName="name" />
+    </div>
+    <div class="field">
+      <label for="filter-address">Address</label>
+      <input id="filter-address" type="text" formControlName="address" />
+    </div>
+    <div class="field">
+      <label for="filter-min-price">Minimum Price</label>
+      <input id="filter-min-price" type="number" min="0" step="0.01" formControlName="minPrice" />
+    </div>
+    <div class="field">
+      <label for="filter-max-price">Maximum Price</label>
+      <input id="filter-max-price" type="number" min="0" step="0.01" formControlName="maxPrice" />
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="primary-button">Apply Filters</button>
+      <button type="button" class="secondary-button" (click)="clearFilters()">Clear</button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="state state-loading" role="status">Loading properties…</div>
+  } @else if (errorMessage()) {
+    <div class="state state-error" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-button" (click)="loadProperties()">Retry</button>
+    </div>
+  } @else if (properties().length === 0) {
+    <div class="state state-empty" role="status">No properties match the current filters.</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <caption class="visually-hidden">Property inventory list</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Property Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Price</th>
+            <th scope="col">Date of Registration</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (property of properties(); track property.id) {
+            <tr>
+              <td>
+                <code class="id-cell" [title]="property.id">{{ formatShortId(property.id) }}</code>
+              </td>
+              <td>{{ property.name }}</td>
+              <td>{{ property.address }}</td>
+              <td class="numeric">{{ formatMoney(property.price, property.currency) }}</td>
+              <td>{{ formatBusinessDate(property.dateOfRegistration) }}</td>
+              <td>
+                <a class="action-link" [routerLink]="['/properties', property.id]">Edit</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" aria-label="Pagination">
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="page() <= 1"
+        (click)="goToPage(page() - 1)"
+      >
+        Previous
+      </button>
+      <p class="page-status">
+        Page {{ page() }} of {{ totalPages() || 1 }}
+        <span class="muted">({{ totalCount() }} total)</span>
+      </p>
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="page() >= totalPages()"
+        (click)="goToPage(page() + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
+</section>

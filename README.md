@@ -63,4 +63,15 @@ In Development, the host applies pending migrations and seeds sample data when t
 
 Defaults: `page=1`, `pageSize=10` (max 100). Contact emails are unique (case-insensitive check). Errors use ProblemDetails.
 
-> Ownership transfer, price-history APIs, dashboard, and Angular UI are not in this slice.
+### Ownership
+
+| Method | Route | Notes |
+|--------|-------|--------|
+| GET | `/api/properties/{propertyId}/ownerships` | Chronological ownership history (empty list if none); 404 if property missing |
+| POST | `/api/properties/{propertyId}/ownerships` | Create historical period or transfer/current ownership |
+
+Ownership is temporal (`EffectiveFrom` / nullable `EffectiveTill`). Current owner has `EffectiveTill = null`. Periods use half-open bounds: meeting at the same boundary date is contiguous, not overlapping. A POST with `EffectiveTill = null` closes any existing current owner at the new `EffectiveFrom`, then creates the new current period atomically. Acquisition price/currency/USD are stored on the ownership record and do **not** change `Property.Price`.
+
+**USD conversion:** deterministic configured rates (no live FX API). EUR→USD uses `1.08733` (aligned with the brief sample `100,000 → 108,733`). Seeded historical `AcquisitionPriceUsd` values are stored as-is and not recalculated.
+
+> Price-history APIs, dashboard, and Angular UI are not in this slice.

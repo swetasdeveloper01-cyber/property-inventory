@@ -17,4 +17,10 @@ public interface IApplicationDbContext
     DbSet<PropertyPriceHistory> PropertyPriceHistories { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Begins a database transaction when the provider supports it; otherwise returns null.
+    /// Ownership transfer uses this so close+create persists atomically on relational providers.
+    /// </summary>
+    Task<IApplicationTransaction?> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }

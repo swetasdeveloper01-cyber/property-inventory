@@ -19,6 +19,17 @@ public class PropertyInventoryDbContext : DbContext, IApplicationDbContext
 
     public DbSet<PropertyPriceHistory> PropertyPriceHistories => Set<PropertyPriceHistory>();
 
+    public async Task<IApplicationTransaction?> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (!Database.IsRelational())
+        {
+            return null;
+        }
+
+        var transaction = await Database.BeginTransactionAsync(cancellationToken);
+        return new EfApplicationTransaction(transaction);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PropertyInventoryDbContext).Assembly);

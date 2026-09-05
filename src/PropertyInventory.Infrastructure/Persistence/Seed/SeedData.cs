@@ -93,7 +93,7 @@ public static class SeedData
             PropertyId = MaisonetteId,
             ContactId = JoshuaMifsudId,
             EffectiveFrom = new DateOnly(2023, 7, 25),
-            EffectiveTill = new DateOnly(2024, 1, 14),
+            EffectiveTill = new DateOnly(2024, 1, 15),
             AcquisitionPrice = 100_000m,
             AcquisitionCurrency = "EUR",
             AcquisitionPriceUsd = 108_733m

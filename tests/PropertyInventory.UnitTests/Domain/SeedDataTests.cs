@@ -17,7 +17,7 @@ public class SeedDataTests
 
         Assert.Equal(SeedData.JoshuaMifsudId, ownerships[0].ContactId);
         Assert.Equal(new DateOnly(2023, 7, 25), ownerships[0].EffectiveFrom);
-        Assert.Equal(new DateOnly(2024, 1, 14), ownerships[0].EffectiveTill);
+        Assert.Equal(new DateOnly(2024, 1, 15), ownerships[0].EffectiveTill);
         Assert.Equal(100_000m, ownerships[0].AcquisitionPrice);
         Assert.Equal(108_733m, ownerships[0].AcquisitionPriceUsd);
 

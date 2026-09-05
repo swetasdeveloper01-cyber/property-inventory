@@ -19,7 +19,10 @@ public class PropertyOwnership
     public DateOnly EffectiveFrom { get; set; }
 
     /// <summary>
-    /// Inclusive end of the ownership period, or null when this is the active ownership.
+    /// Exclusive end of the ownership period under half-open semantics
+    /// <c>[EffectiveFrom, EffectiveTill)</c>, or null when this is the current ownership.
+    /// Contiguous periods meet when the previous <see cref="EffectiveTill"/> equals the next
+    /// <see cref="EffectiveFrom"/>.
     /// </summary>
     public DateOnly? EffectiveTill { get; set; }
 

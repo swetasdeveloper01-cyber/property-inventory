@@ -129,4 +129,11 @@ Field mapping:
 
 Current ownership (`EffectiveTill = null`) is included because each acquisition is a sale to that owner and the client sample lists current owners (e.g. Carmen Attard, Joe Borg). Ordered by `DateOfPurchase` descending, then property name, then Id.
 
-> Feature UIs (dashboard table, property/contact screens) will follow in later frontend slices.
+### Dashboard UI
+
+- Route: `/dashboard`
+- Consumes: `GET /api/dashboard/sales` via `DashboardApiService`
+- Table columns: ID (truncated GUID + tooltip), Property Name, Asking Price, Owner, Date of Purchase (`d MMM yyyy`), Sold At Price (original currency), Sold At Price (USD)
+- Loading / empty / error + Retry states are handled in the page component
+
+> Property and Contact feature screens will follow in later frontend slices.

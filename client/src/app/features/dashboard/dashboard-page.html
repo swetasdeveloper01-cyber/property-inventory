@@ -1,0 +1,67 @@
+<section class="dashboard">
+  <header class="dashboard-header">
+    <div>
+      <h1>Sales Dashboard</h1>
+      <p class="lede">
+        Ownership acquisition events for each property sale or owner change.
+      </p>
+    </div>
+
+    @if (!loading() && !errorMessage()) {
+      <p class="summary" aria-live="polite">
+        {{ sales().length }} ownership record{{ sales().length === 1 ? '' : 's' }}
+      </p>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="state state-loading" role="status" aria-live="polite">
+      Loading sales data…
+    </div>
+  } @else if (errorMessage()) {
+    <div class="state state-error" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-button" (click)="loadSales()">
+        Retry
+      </button>
+    </div>
+  } @else if (sales().length === 0) {
+    <div class="state state-empty" role="status">
+      No sales or ownership history available.
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="sales-table">
+        <caption class="visually-hidden">
+          Property sales and ownership changes
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Property Name</th>
+            <th scope="col">Asking Price</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Date of Purchase</th>
+            <th scope="col">Sold At Price</th>
+            <th scope="col">Sold At Price (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of sales(); track item.id) {
+            <tr>
+              <td>
+                <code class="id-cell" [title]="item.id">{{ formatShortId(item.id) }}</code>
+              </td>
+              <td>{{ item.propertyName }}</td>
+              <td class="numeric">{{ formatMoney(item.askingPrice, item.askingCurrency) }}</td>
+              <td>{{ item.owner }}</td>
+              <td>{{ formatBusinessDate(item.dateOfPurchase) }}</td>
+              <td class="numeric">{{ formatMoney(item.soldAtPrice, item.soldAtCurrency) }}</td>
+              <td class="numeric">{{ formatMoney(item.soldAtPriceUsd, 'USD') }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

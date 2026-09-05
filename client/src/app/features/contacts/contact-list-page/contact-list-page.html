@@ -1,0 +1,105 @@
+<section class="contact-list">
+  <header class="page-header">
+    <div>
+      <h1>Contacts</h1>
+      <p class="lede">Manage contact records used as property owners.</p>
+    </div>
+    <a class="primary-button" routerLink="/contacts/new">Add Contact</a>
+  </header>
+
+  @if (successMessage()) {
+    <div class="banner banner-success" role="status">
+      <span>{{ successMessage() }}</span>
+      <button type="button" class="link-button" (click)="dismissSuccess()">Dismiss</button>
+    </div>
+  }
+
+  <form class="filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <div class="field">
+      <label for="filter-first-name">First Name</label>
+      <input id="filter-first-name" type="text" formControlName="firstName" />
+    </div>
+    <div class="field">
+      <label for="filter-last-name">Last Name</label>
+      <input id="filter-last-name" type="text" formControlName="lastName" />
+    </div>
+    <div class="field">
+      <label for="filter-email">Email</label>
+      <input id="filter-email" type="text" formControlName="email" />
+    </div>
+    <div class="field">
+      <label for="filter-phone">Phone</label>
+      <input id="filter-phone" type="text" formControlName="phone" />
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="primary-button">Apply Filters</button>
+      <button type="button" class="secondary-button" (click)="clearFilters()">Clear</button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="state state-loading" role="status">Loading contacts…</div>
+  } @else if (errorMessage()) {
+    <div class="state state-error" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-button" (click)="loadContacts()">Retry</button>
+    </div>
+  } @else if (contacts().length === 0) {
+    <div class="state state-empty" role="status">No contacts match the current filters.</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <caption class="visually-hidden">Contact list</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (contact of contacts(); track contact.id) {
+            <tr>
+              <td>
+                <code class="id-cell" [title]="contact.id">{{ formatShortId(contact.id) }}</code>
+              </td>
+              <td>{{ contact.firstName }}</td>
+              <td>{{ contact.lastName }}</td>
+              <td>{{ contact.email }}</td>
+              <td>{{ contact.phoneNumber }}</td>
+              <td>
+                <a class="action-link" [routerLink]="['/contacts', contact.id]">Edit</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" aria-label="Pagination">
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="page() <= 1"
+        (click)="goToPage(page() - 1)"
+      >
+        Previous
+      </button>
+      <p class="page-status">
+        Page {{ page() }} of {{ totalPages() || 1 }}
+        <span class="muted">({{ totalCount() }} total)</span>
+      </p>
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="page() >= totalPages()"
+        (click)="goToPage(page() + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
+</section>

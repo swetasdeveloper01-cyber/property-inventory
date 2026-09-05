@@ -31,7 +31,23 @@ export const routes: Routes = [
   {
     path: 'contacts',
     loadComponent: () =>
-      import('./features/contacts/contacts-page').then((m) => m.ContactsPage)
+      import('./features/contacts/contact-list-page/contact-list-page').then(
+        (m) => m.ContactListPage
+      )
+  },
+  {
+    path: 'contacts/new',
+    loadComponent: () =>
+      import('./features/contacts/contact-form-page/contact-form-page').then(
+        (m) => m.ContactFormPage
+      )
+  },
+  {
+    path: 'contacts/:id',
+    loadComponent: () =>
+      import('./features/contacts/contact-form-page/contact-form-page').then(
+        (m) => m.ContactFormPage
+      )
   },
   { path: '**', redirectTo: 'dashboard' }
 ];

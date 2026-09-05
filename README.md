@@ -58,7 +58,7 @@ Frontend structure:
 ```
 client/src/app/
   core/           # API config, models, HTTP services, ProblemDetails interceptor
-  features/       # dashboard + properties UI; contacts placeholder
+  features/       # dashboard + properties + contacts UI
   shared/         # shared utilities and placeholder component
 ```
 
@@ -145,4 +145,13 @@ Current ownership (`EffectiveTill = null`) is included because each acquisition 
 - Create uses `POST /api/properties`; update uses `PUT /api/properties/{id}` (backend records asking-price history when price/currency change — UI does not call the price-history API)
 - Ownership / price-history screens are not implemented yet (placeholders on the edit page)
 
-> Contact feature screens will follow in a later frontend slice.
+### Contact UI
+
+- `/contacts` — paged list with filters (`firstName`, `lastName`, `email`, `phone`), Apply/Clear, Edit link
+- `/contacts/new` — create form (first name, last name, phone, email)
+- `/contacts/:id` — edit form; loads by id; 404 if missing
+- Filters and pagination call `GET /api/contacts`
+- Create uses `POST /api/contacts`; update uses `PUT /api/contacts/{id}`
+- Duplicate email returns HTTP 409; UI shows a field-level message and does not attempt client-side uniqueness checks
+
+> Ownership and Price History UIs will follow in later frontend slices.

@@ -1,0 +1,108 @@
+<section class="contact-form-page">
+  <header class="page-header">
+    <div>
+      <h1>{{ isCreate() ? 'Add Contact' : 'Edit Contact' }}</h1>
+      <p class="lede">
+        @if (isCreate()) {
+          Create a contact with name, phone, and email.
+        } @else if (contactId()) {
+          Update contact details
+          <span class="muted">({{ formatShortId(contactId()!) }})</span>.
+        }
+      </p>
+    </div>
+    <a class="secondary-button" routerLink="/contacts">Back to list</a>
+  </header>
+
+  @if (loading()) {
+    <div class="state state-loading" role="status">Loading contact…</div>
+  } @else if (loadError()) {
+    <div class="state state-error" role="alert">
+      <p>{{ loadError() }}</p>
+      <a class="secondary-button" routerLink="/contacts">Back to list</a>
+    </div>
+  } @else {
+    @if (formError()) {
+      <div class="banner banner-error" role="alert">{{ formError() }}</div>
+    }
+
+    <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field-row">
+        <div class="field">
+          <label for="contact-first-name">First Name</label>
+          <input
+            id="contact-first-name"
+            type="text"
+            formControlName="firstName"
+            maxlength="100"
+            autocomplete="given-name"
+            [attr.aria-invalid]="controlError('firstName') ? true : null"
+            [attr.aria-describedby]="controlError('firstName') ? 'contact-first-name-error' : null"
+          />
+          @if (controlError('firstName'); as message) {
+            <p id="contact-first-name-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="contact-last-name">Last Name</label>
+          <input
+            id="contact-last-name"
+            type="text"
+            formControlName="lastName"
+            maxlength="100"
+            autocomplete="family-name"
+            [attr.aria-invalid]="controlError('lastName') ? true : null"
+            [attr.aria-describedby]="controlError('lastName') ? 'contact-last-name-error' : null"
+          />
+          @if (controlError('lastName'); as message) {
+            <p id="contact-last-name-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="contact-phone">Phone Number</label>
+        <input
+          id="contact-phone"
+          type="tel"
+          formControlName="phoneNumber"
+          maxlength="30"
+          autocomplete="tel"
+          [attr.aria-invalid]="controlError('phoneNumber') ? true : null"
+          [attr.aria-describedby]="controlError('phoneNumber') ? 'contact-phone-error' : null"
+        />
+        @if (controlError('phoneNumber'); as message) {
+          <p id="contact-phone-error" class="field-error">{{ message }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="contact-email">Email</label>
+        <input
+          id="contact-email"
+          type="email"
+          formControlName="email"
+          maxlength="256"
+          autocomplete="email"
+          [attr.aria-invalid]="controlError('email') ? true : null"
+          [attr.aria-describedby]="controlError('email') ? 'contact-email-error' : null"
+        />
+        @if (controlError('email'); as message) {
+          <p id="contact-email-error" class="field-error">{{ message }}</p>
+        }
+      </div>
+
+      <p class="hint">Email addresses must be unique across contacts.</p>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-button" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isCreate() ? 'Create' : 'Save' }}
+        </button>
+        <button type="button" class="secondary-button" (click)="cancel()" [disabled]="saving()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  }
+</section>

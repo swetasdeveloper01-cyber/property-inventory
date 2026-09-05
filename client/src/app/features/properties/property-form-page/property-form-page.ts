@@ -17,11 +17,12 @@ import { PropertyApiService } from '../../../core/services/property-api.service'
 import { applyApiFieldErrors } from '../../../shared/utils/api-form-errors';
 import { formatShortId } from '../../../shared/utils/format';
 import { PropertyOwnershipSection } from '../property-ownership-section/property-ownership-section';
+import { PropertyPriceHistorySection } from '../property-price-history-section/property-price-history-section';
 
 @Component({
   selector: 'app-property-form-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, PropertyOwnershipSection],
+  imports: [ReactiveFormsModule, RouterLink, PropertyOwnershipSection, PropertyPriceHistorySection],
   templateUrl: './property-form-page.html',
   styleUrl: './property-form-page.css'
 })
@@ -98,6 +99,13 @@ export class PropertyFormPage implements OnInit {
 
   cancel(): void {
     void this.router.navigate(['/properties']);
+  }
+
+  onAskingPriceChanged(change: { price: number; currency: string }): void {
+    this.form.patchValue({
+      price: change.price,
+      currency: change.currency
+    });
   }
 
   controlError(controlName: string): string | null {

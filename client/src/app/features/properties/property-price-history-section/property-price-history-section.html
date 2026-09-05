@@ -1,0 +1,133 @@
+<section class="price-history-section" aria-labelledby="price-history-heading">
+  <header class="section-header">
+    <div>
+      <h2 id="price-history-heading">Asking Price History</h2>
+      <p class="lede">
+        Historical changes to this property’s current asking price. Ownership acquisition prices are
+        separate.
+      </p>
+    </div>
+    @if (!loading() && !errorMessage()) {
+      <button type="button" class="primary-button" (click)="openForm()">
+        Record Price Change
+      </button>
+    }
+  </header>
+
+  @if (currentPrice !== null && currentCurrency) {
+    <p class="current-summary" role="status">
+      <span class="badge">Current</span>
+      Current asking price:
+      <strong>{{ formatMoney(currentPrice, currentCurrency) }}</strong>
+      <span class="muted">(from property details)</span>
+    </p>
+  }
+
+  @if (successMessage()) {
+    <div class="banner banner-success" role="status">{{ successMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="state state-loading" role="status">Loading asking price history…</div>
+  } @else if (errorMessage()) {
+    <div class="state state-error" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-button" (click)="loadPrices()">Retry</button>
+    </div>
+  } @else if (prices().length === 0) {
+    <div class="state state-empty" role="status">No asking price history recorded.</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <caption class="visually-hidden">Asking price history for this property</caption>
+        <thead>
+          <tr>
+            <th scope="col">Effective Date</th>
+            <th scope="col">Asking Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of prices(); track entry.id) {
+            <tr>
+              <td>{{ formatBusinessDate(entry.effectiveDate) }}</td>
+              <td class="numeric">{{ formatMoney(entry.amount, entry.currency) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (formVisible()) {
+    <form class="price-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h3>Record Price Change</h3>
+      <p class="hint">
+        This updates the current asking price and appends a history row via the dedicated price API.
+        It does not use the property Save action.
+      </p>
+
+      @if (formError()) {
+        <div class="banner banner-error" role="alert">{{ formError() }}</div>
+      }
+
+      <div class="field-row">
+        <div class="field">
+          <label for="price-amount">Amount</label>
+          <input
+            id="price-amount"
+            type="number"
+            formControlName="amount"
+            min="0.01"
+            step="0.01"
+            [attr.aria-invalid]="controlError('amount') ? true : null"
+            [attr.aria-describedby]="controlError('amount') ? 'price-amount-error' : null"
+          />
+          @if (controlError('amount'); as message) {
+            <p id="price-amount-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="price-currency">Currency</label>
+          <input
+            id="price-currency"
+            type="text"
+            formControlName="currency"
+            maxlength="3"
+            class="currency-input"
+            [attr.aria-invalid]="controlError('currency') ? true : null"
+            [attr.aria-describedby]="controlError('currency') ? 'price-currency-error' : null"
+          />
+          @if (controlError('currency'); as message) {
+            <p id="price-currency-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="price-effective-date">Effective Date</label>
+          <input
+            id="price-effective-date"
+            type="date"
+            formControlName="effectiveDate"
+            [attr.aria-invalid]="controlError('effectiveDate') ? true : null"
+            [attr.aria-describedby]="
+              controlError('effectiveDate') ? 'price-effective-date-error' : null
+            "
+          />
+          @if (controlError('effectiveDate'); as message) {
+            <p id="price-effective-date-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-button" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : 'Save Price Change' }}
+        </button>
+        <button type="button" class="secondary-button" (click)="cancelForm()" [disabled]="saving()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  }
+</section>

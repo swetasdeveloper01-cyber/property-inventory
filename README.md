@@ -155,6 +155,15 @@ Current ownership (`EffectiveTill = null`) is included because each acquisition 
 - Owner contact is chosen from contacts loaded via `ContactApiService` (pages of 100 until complete)
 - Acquisition USD is displayed from the API response; the UI never submits or calculates USD
 
+### Asking Price History UI
+
+- Shown on `/properties/:id` below Ownership History
+- Loads `GET /api/properties/{propertyId}/prices` and displays Effective Date + Amount/Currency in backend order
+- **Record Price Change** uses only `POST /api/properties/{propertyId}/prices` (updates current asking price + history)
+- Editing current Price/Currency via the property form uses only `PUT /api/properties/{id}` (backend records history when values change)
+- The UI never calls both APIs for one user action
+- After a successful price-history POST, the property form’s current price/currency is synced from the API response
+
 ### Contact UI
 
 - `/contacts` — paged list with filters (`firstName`, `lastName`, `email`, `phone`), Apply/Clear, Edit link
@@ -163,5 +172,3 @@ Current ownership (`EffectiveTill = null`) is included because each acquisition 
 - Filters and pagination call `GET /api/contacts`
 - Create uses `POST /api/contacts`; update uses `PUT /api/contacts/{id}`
 - Duplicate email returns HTTP 409; UI shows a field-level message and does not attempt client-side uniqueness checks
-
-> Price History UI will follow in a later frontend slice.

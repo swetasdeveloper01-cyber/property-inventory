@@ -244,7 +244,7 @@ describe('PropertyFormPage', () => {
       });
     });
 
-    it('update sends the expected payload', async () => {
+    it('update sends the expected payload and does not call price-history POST', async () => {
       fixture.detectChanges();
       await fixture.whenStable();
       fixture.detectChanges();
@@ -260,6 +260,17 @@ describe('PropertyFormPage', () => {
         dateOfRegistration: '2020-03-15'
       });
       expect(priceApi.createPrice).not.toHaveBeenCalled();
+    });
+
+    it('syncs current asking price after price-history section emits a change', async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      fixture.componentInstance.onAskingPriceChanged({ price: 145000, currency: 'USD' });
+
+      expect(fixture.componentInstance.form.getRawValue().price).toBe(145000);
+      expect(fixture.componentInstance.form.getRawValue().currency).toBe('USD');
     });
 
     it('missing property / API 404 displays an error', async () => {

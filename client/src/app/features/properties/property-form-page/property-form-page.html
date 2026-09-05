@@ -130,15 +130,12 @@
     @if (!isCreate() && propertyId()) {
       <app-property-ownership-section [propertyId]="propertyId()!" />
 
-      <aside class="next-slice" aria-label="Related property features">
-        <h2>Related</h2>
-        <p class="muted">Asking-price history will be available in a later slice.</p>
-        <ul>
-          <li>
-            <span class="placeholder-link" aria-disabled="true">Price history (coming soon)</span>
-          </li>
-        </ul>
-      </aside>
+      <app-property-price-history-section
+        [propertyId]="propertyId()!"
+        [currentPrice]="form.controls.price.value"
+        [currentCurrency]="form.controls.currency.value"
+        (askingPriceChanged)="onAskingPriceChanged($event)"
+      />
     }
   }
 </section>

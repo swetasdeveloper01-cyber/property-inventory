@@ -14,7 +14,7 @@ src/
 tests/
   PropertyInventory.UnitTests
   PropertyInventory.IntegrationTests
-client/                              # Angular UI (later phase)
+client/                              # Angular 22 UI (foundation + API layer)
 postman/                             # API collection (later phase)
 ```
 
@@ -23,21 +23,48 @@ postman/                             # API collection (later phase)
 ## Prerequisites
 
 - .NET SDK 10 (LTS)
+- Node.js 22+ and npm 10+ (for the Angular client)
 - SQL Server LocalDB (or another SQL Server instance; update `ConnectionStrings:DefaultConnection`)
 - EF Core tools (optional): `dotnet tool install --global dotnet-ef`
 
 ## Local setup
 
+### Backend
+
 ```bash
 dotnet restore PropertyInventory.sln
 dotnet build PropertyInventory.sln
 dotnet test PropertyInventory.sln
-dotnet run --project src/PropertyInventory.Api
+dotnet run --project src/PropertyInventory.Api --launch-profile http
 ```
 
-In Development, the host applies pending migrations and seeds sample data when the database is empty.
+API (Development http profile): `http://localhost:5248`
 
-## Implemented API endpoints (current slice)
+In Development, the host applies pending migrations, seeds sample data when empty, and enables CORS for `http://localhost:4200`.
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm start
+```
+
+Angular app: `http://localhost:4200`  
+API base URL (configured in `client/src/environments/environment.ts`): `http://localhost:5248`
+
+Frontend structure:
+
+```
+client/src/app/
+  core/           # API config, models, HTTP services, ProblemDetails interceptor
+  features/       # dashboard / properties / contacts placeholders
+  shared/         # shared placeholder component
+```
+
+Typed API services mirror the backend controllers. Feature UIs are placeholders in this foundation slice.
+
+## Implemented API endpoints
 
 ### Properties
 
@@ -102,4 +129,4 @@ Field mapping:
 
 Current ownership (`EffectiveTill = null`) is included because each acquisition is a sale to that owner and the client sample lists current owners (e.g. Carmen Attard, Joe Borg). Ordered by `DateOfPurchase` descending, then property name, then Id.
 
-> Angular UI is not in this slice.
+> Feature UIs (dashboard table, property/contact screens) will follow in later frontend slices.

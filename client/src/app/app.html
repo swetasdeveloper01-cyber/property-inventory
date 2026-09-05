@@ -1,0 +1,14 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">{{ title }}</div>
+    <nav class="app-nav" aria-label="Primary">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/properties" routerLinkActive="active">Properties</a>
+      <a routerLink="/contacts" routerLinkActive="active">Contacts</a>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <router-outlet />
+  </main>
+</div>

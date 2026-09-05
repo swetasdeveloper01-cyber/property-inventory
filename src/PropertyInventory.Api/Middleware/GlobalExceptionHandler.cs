@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PropertyInventory.Application.Common.Exceptions;
 
@@ -97,11 +98,19 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         return problem;
     }
 
-    private static bool IsUniqueConstraintViolation(DbUpdateException exception)
+    /// <summary>
+    /// True when the failure chain includes a SQL Server unique index (2601) or unique constraint (2627) violation.
+    /// </summary>
+    internal static bool IsUniqueConstraintViolation(DbUpdateException exception)
     {
-        var message = exception.InnerException?.Message ?? exception.Message;
-        return message.Contains("UNIQUE", StringComparison.OrdinalIgnoreCase) ||
-               message.Contains("duplicate", StringComparison.OrdinalIgnoreCase) ||
-               message.Contains("IX_Contacts_Email", StringComparison.OrdinalIgnoreCase);
+        for (Exception? current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is SqlException { Number: 2601 or 2627 })
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

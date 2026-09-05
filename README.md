@@ -57,6 +57,11 @@ In Development, startup:
 - applies pending EF Core migrations
 - seeds sample data when the database is empty
 - enables CORS for `http://localhost:4200`
+- does **not** redirect HTTP → HTTPS (so Angular can call `http://localhost:5248` without CORS/redirect issues)
+- serves OpenAPI JSON at `/openapi/v1.json`
+- serves Swagger UI at `/swagger` (consumes the OpenAPI document above)
+
+Use the **http** launch profile for local Angular development. The `https` profile remains available for HTTPS-only clients; Development still skips HTTPS redirection so the Angular HTTP base URL keeps working.
 
 Manual migration alternative (optional; not required if you use Development startup):
 
@@ -73,7 +78,10 @@ npm start
 ```
 
 Angular app: `http://localhost:4200`  
-API base URL: `client/src/environments/environment.ts` → `http://localhost:5248`
+API base URL: `client/src/environments/environment.ts` → `http://localhost:5248` (HTTP; matches the API Development http profile)
+
+Swagger UI (API Development): `http://localhost:5248/swagger`  
+OpenAPI JSON: `http://localhost:5248/openapi/v1.json`
 
 ## Assumptions
 

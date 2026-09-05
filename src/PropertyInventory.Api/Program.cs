@@ -26,12 +26,24 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
+    // OpenAPI document at /openapi/v1.json; Swagger UI at /swagger consumes that document.
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "Property Inventory API v1");
+    });
+
+    // Restricted Angular Dev CORS before endpoints; no HTTPS redirect in Development
+    // so http://localhost:4200 can call http://localhost:5248 without a 307 hop.
     app.UseCors("AngularDev");
     await DatabaseSeeder.MigrateAndSeedAsync(app.Services);
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.MapControllers();
 
 app.Run();

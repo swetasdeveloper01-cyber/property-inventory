@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PropertyInventory.Application.Common.Interfaces;
 using PropertyInventory.Application.Contacts;
+using PropertyInventory.Application.Dashboard;
 using PropertyInventory.Application.ExchangeRates;
 using PropertyInventory.Application.Ownerships;
 using PropertyInventory.Application.Prices;
@@ -17,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<PropertyService>();
         services.AddScoped<ContactService>();
         services.AddScoped<OwnershipService>();
+        services.AddScoped<DashboardService>();
         return services;
     }
 }

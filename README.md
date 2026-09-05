@@ -85,4 +85,21 @@ Asking-price history (`PropertyPriceHistory`) is separate from ownership acquisi
 
 Price changes go through one application path (`PropertyPriceService`): property create records an initial history row at `DateOfRegistration`; `PUT /api/properties/{id}` records history only when Price/Currency actually change (EffectiveDate = UTC today); `POST .../prices` always records the supplied `EffectiveDate`. Same-day or out-of-order EffectiveDate values are allowed; results are ordered by EffectiveDate then Id.
 
-> Dashboard and Angular UI are not in this slice.
+### Sales dashboard
+
+| Method | Route | Notes |
+|--------|-------|--------|
+| GET | `/api/dashboard/sales` | One row per ownership acquisition/sale event (including current owners) |
+
+Field mapping:
+
+- `Id` → ownership Id
+- `PropertyName` → property name
+- `AskingPrice` / `AskingCurrency` → **current** property asking price
+- `Owner` → contact first + last name
+- `DateOfPurchase` → ownership `EffectiveFrom`
+- `SoldAtPrice` / `SoldAtCurrency` / `SoldAtPriceUsd` → ownership acquisition fields (stored USD; not recalculated)
+
+Current ownership (`EffectiveTill = null`) is included because each acquisition is a sale to that owner and the client sample lists current owners (e.g. Carmen Attard, Joe Borg). Ordered by `DateOfPurchase` descending, then property name, then Id.
+
+> Angular UI is not in this slice.

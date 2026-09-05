@@ -74,4 +74,15 @@ Ownership is temporal (`EffectiveFrom` / nullable `EffectiveTill`). Current owne
 
 **USD conversion:** deterministic configured rates (no live FX API). EUR→USD uses `1.08733` (aligned with the brief sample `100,000 → 108,733`). Seeded historical `AcquisitionPriceUsd` values are stored as-is and not recalculated.
 
-> Price-history APIs, dashboard, and Angular UI are not in this slice.
+### Asking price history
+
+| Method | Route | Notes |
+|--------|-------|--------|
+| GET | `/api/properties/{propertyId}/prices` | Chronological asking-price history; empty list if none; 404 if property missing |
+| POST | `/api/properties/{propertyId}/prices` | Record a new asking price (`amount`, `currency`, `effectiveDate`) and update current `Property.Price`/`Currency` atomically |
+
+Asking-price history (`PropertyPriceHistory`) is separate from ownership acquisition/sold price. Changing asking price never updates ownership acquisition fields; ownership transfer never updates asking price.
+
+Price changes go through one application path (`PropertyPriceService`): property create records an initial history row at `DateOfRegistration`; `PUT /api/properties/{id}` records history only when Price/Currency actually change (EffectiveDate = UTC today); `POST .../prices` always records the supplied `EffectiveDate`. Same-day or out-of-order EffectiveDate values are allowed; results are ordered by EffectiveDate then Id.
+
+> Dashboard and Angular UI are not in this slice.

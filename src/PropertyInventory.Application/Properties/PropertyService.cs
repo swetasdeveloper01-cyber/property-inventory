@@ -3,6 +3,7 @@ using PropertyInventory.Application.Common.Exceptions;
 using PropertyInventory.Application.Common.Interfaces;
 using PropertyInventory.Application.Common.Models;
 using PropertyInventory.Application.Common.Validation;
+using PropertyInventory.Application.Prices;
 using PropertyInventory.Domain.Entities;
 
 namespace PropertyInventory.Application.Properties;
@@ -10,10 +11,12 @@ namespace PropertyInventory.Application.Properties;
 public class PropertyService
 {
     private readonly IApplicationDbContext _dbContext;
+    private readonly PropertyPriceService _propertyPriceService;
 
-    public PropertyService(IApplicationDbContext dbContext)
+    public PropertyService(IApplicationDbContext dbContext, PropertyPriceService propertyPriceService)
     {
         _dbContext = dbContext;
+        _propertyPriceService = propertyPriceService;
     }
 
     public async Task<PagedResult<PropertyDto>> GetAsync(PropertyQuery query, CancellationToken cancellationToken = default)
@@ -97,7 +100,7 @@ public class PropertyService
 
         var property = MapNewProperty(request);
         _dbContext.Properties.Add(property);
-        _dbContext.PropertyPriceHistories.Add(CreateInitialPriceHistory(property));
+        _propertyPriceService.RecordInitialAskingPrice(property);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         return ToDto(property);
@@ -131,11 +134,10 @@ public class PropertyService
         {
             var property = MapNewProperty(request);
             _dbContext.Properties.Add(property);
-            _dbContext.PropertyPriceHistories.Add(CreateInitialPriceHistory(property));
+            _propertyPriceService.RecordInitialAskingPrice(property);
             created.Add(property);
         }
 
-        // Single SaveChanges keeps the batch atomic on relational providers.
         await _dbContext.SaveChangesAsync(cancellationToken);
         return created.Select(ToDto).ToList();
     }
@@ -224,27 +226,17 @@ public class PropertyService
 
     private void ApplyUpdate(Property property, UpdatePropertyRequest request)
     {
-        var currency = InputRules.NormalizeCurrency(request.Currency);
-        var priceChanged = property.Price != request.Price ||
-                           !string.Equals(property.Currency, currency, StringComparison.Ordinal);
-
         property.Name = request.Name.Trim();
         property.Address = request.Address.Trim();
-        property.Price = request.Price;
-        property.Currency = currency;
         property.DateOfRegistration = request.DateOfRegistration;
 
-        if (priceChanged)
-        {
-            _dbContext.PropertyPriceHistories.Add(new PropertyPriceHistory
-            {
-                Id = Guid.NewGuid(),
-                PropertyId = property.Id,
-                Amount = property.Price,
-                Currency = property.Currency,
-                EffectiveDate = DateOnly.FromDateTime(DateTime.UtcNow)
-            });
-        }
+        // Single price-history path shared with POST /api/properties/{id}/prices.
+        _propertyPriceService.ApplyAskingPriceChange(
+            property,
+            request.Price,
+            request.Currency,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            forceRecord: false);
     }
 
     private static Property MapNewProperty(CreatePropertyRequest request) => new()
@@ -255,15 +247,6 @@ public class PropertyService
         Price = request.Price,
         Currency = InputRules.NormalizeCurrency(request.Currency),
         DateOfRegistration = request.DateOfRegistration
-    };
-
-    private static PropertyPriceHistory CreateInitialPriceHistory(Property property) => new()
-    {
-        Id = Guid.NewGuid(),
-        PropertyId = property.Id,
-        Amount = property.Price,
-        Currency = property.Currency,
-        EffectiveDate = property.DateOfRegistration
     };
 
     private static void ValidateCreate(CreatePropertyRequest request)

@@ -143,7 +143,17 @@ Current ownership (`EffectiveTill = null`) is included because each acquisition 
 - `/properties/:id` — edit form; loads by id; 404 if missing
 - Filters and pagination call `GET /api/properties` (no client-side full-dataset filtering)
 - Create uses `POST /api/properties`; update uses `PUT /api/properties/{id}` (backend records asking-price history when price/currency change — UI does not call the price-history API)
-- Ownership / price-history screens are not implemented yet (placeholders on the edit page)
+- Ownership history / transfer live on `/properties/:id` via `OwnershipApiService` (see Ownership UI)
+- Price-history screen is not implemented yet (placeholder on the edit page)
+
+### Ownership UI
+
+- Shown on `/properties/:id` (property edit/detail), not as a top-level nav area
+- Loads `GET /api/properties/{propertyId}/ownerships`
+- Current owner = record with `EffectiveTill = null` (also exposed as `isCurrent`)
+- Add / Transfer uses a single `POST /api/properties/{propertyId}/ownerships`; the backend closes the previous current owner when a new open-ended period is created
+- Owner contact is chosen from contacts loaded via `ContactApiService` (pages of 100 until complete)
+- Acquisition USD is displayed from the API response; the UI never submits or calculates USD
 
 ### Contact UI
 
@@ -154,4 +164,4 @@ Current ownership (`EffectiveTill = null`) is included because each acquisition 
 - Create uses `POST /api/contacts`; update uses `PUT /api/contacts/{id}`
 - Duplicate email returns HTTP 409; UI shows a field-level message and does not attempt client-side uniqueness checks
 
-> Ownership and Price History UIs will follow in later frontend slices.
+> Price History UI will follow in a later frontend slice.

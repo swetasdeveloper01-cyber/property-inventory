@@ -3,6 +3,8 @@ import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angul
 import { of, throwError } from 'rxjs';
 import { ApiError } from '../../../core/models/problem-details';
 import { PropertyDto } from '../../../core/models/property.models';
+import { ContactApiService } from '../../../core/services/contact-api.service';
+import { OwnershipApiService } from '../../../core/services/ownership-api.service';
 import { PriceApiService } from '../../../core/services/price-api.service';
 import { PropertyApiService } from '../../../core/services/property-api.service';
 import { PropertyFormPage } from './property-form-page';
@@ -17,6 +19,13 @@ describe('PropertyFormPage', () => {
   let priceApi: {
     getPrices: ReturnType<typeof vi.fn>;
     createPrice: ReturnType<typeof vi.fn>;
+  };
+  let ownershipApi: {
+    getOwnerships: ReturnType<typeof vi.fn>;
+    createOwnership: ReturnType<typeof vi.fn>;
+  };
+  let contactApi: {
+    getContacts: ReturnType<typeof vi.fn>;
   };
   let router: Router;
 
@@ -45,6 +54,17 @@ describe('PropertyFormPage', () => {
       createPrice: vi.fn(() => of({}))
     };
 
+    ownershipApi = {
+      getOwnerships: vi.fn(() => of([])),
+      createOwnership: vi.fn(() => of({}))
+    };
+
+    contactApi = {
+      getContacts: vi.fn(() =>
+        of({ items: [], page: 1, pageSize: 100, totalCount: 0, totalPages: 0 })
+      )
+    };
+
     const paramMap =
       mode === 'create'
         ? convertToParamMap({})
@@ -55,6 +75,8 @@ describe('PropertyFormPage', () => {
       providers: [
         { provide: PropertyApiService, useValue: api },
         { provide: PriceApiService, useValue: priceApi },
+        { provide: OwnershipApiService, useValue: ownershipApi },
+        { provide: ContactApiService, useValue: contactApi },
         provideRouter([{ path: 'properties', component: PropertyFormPage }]),
         {
           provide: ActivatedRoute,

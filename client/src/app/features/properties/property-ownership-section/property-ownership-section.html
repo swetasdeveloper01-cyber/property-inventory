@@ -1,0 +1,205 @@
+<section class="ownership-section" aria-labelledby="ownership-heading">
+  <header class="section-header">
+    <div>
+      <h2 id="ownership-heading">Ownership History</h2>
+      <p class="lede">
+        Temporal ownership records for this property. Acquisition USD is calculated by the API.
+      </p>
+    </div>
+    @if (!loading() && !errorMessage()) {
+      <button type="button" class="primary-button" (click)="openForm()">
+        {{ actionLabel() }}
+      </button>
+    }
+  </header>
+
+  @if (successMessage()) {
+    <div class="banner banner-success" role="status">{{ successMessage() }}</div>
+  }
+
+  @if (currentOwner(); as current) {
+    <p class="current-summary" role="status">
+      <span class="badge" aria-label="Current owner">Current</span>
+      Current owner: <strong>{{ ownerName(current) }}</strong>
+      <span class="muted">({{ dateRangeLabel(current) }})</span>
+    </p>
+  }
+
+  @if (loading()) {
+    <div class="state state-loading" role="status">Loading ownership history…</div>
+  } @else if (errorMessage()) {
+    <div class="state state-error" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-button" (click)="loadOwnerships()">Retry</button>
+    </div>
+  } @else if (ownerships().length === 0) {
+    <div class="state state-empty" role="status">No ownership history for this property yet.</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <caption class="visually-hidden">Ownership history for this property</caption>
+        <thead>
+          <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Owner</th>
+            <th scope="col">From</th>
+            <th scope="col">Till</th>
+            <th scope="col">Acquisition</th>
+            <th scope="col">USD</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ownership of ownerships(); track ownership.id) {
+            <tr [class.current-row]="isCurrent(ownership)">
+              <td>
+                @if (isCurrent(ownership)) {
+                  <span class="badge">Current</span>
+                  <span class="visually-hidden">Current ownership</span>
+                } @else {
+                  <span class="muted">Historical</span>
+                }
+              </td>
+              <td>
+                <div>{{ ownerName(ownership) }}</div>
+                <div class="muted email">{{ ownership.ownerEmail }}</div>
+              </td>
+              <td>{{ formatBusinessDate(ownership.effectiveFrom) }}</td>
+              <td>
+                @if (ownership.effectiveTill === null) {
+                  Present
+                } @else {
+                  {{ formatBusinessDate(ownership.effectiveTill) }}
+                }
+              </td>
+              <td class="numeric">
+                {{ formatMoney(ownership.acquisitionPrice, ownership.acquisitionCurrency) }}
+              </td>
+              <td class="numeric">{{ formatMoney(ownership.acquisitionPriceUsd, 'USD') }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (formVisible()) {
+    <form class="ownership-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h3>{{ actionLabel() }}</h3>
+      <p class="hint">
+        Leave Effective Till empty to set a current owner. The API closes any existing current
+        ownership in the same request when transferring.
+      </p>
+
+      @if (formError()) {
+        <div class="banner banner-error" role="alert">{{ formError() }}</div>
+      }
+
+      <div class="field">
+        <label for="ownership-contact">Owner</label>
+        @if (contactsLoading()) {
+          <p class="muted" role="status">Loading contacts…</p>
+        } @else if (contactsError()) {
+          <p class="field-error" role="alert">{{ contactsError() }}</p>
+        } @else {
+          <select
+            id="ownership-contact"
+            formControlName="contactId"
+            [attr.aria-invalid]="controlError('contactId') ? true : null"
+            [attr.aria-describedby]="controlError('contactId') ? 'ownership-contact-error' : null"
+          >
+            <option value="">Select a contact</option>
+            @for (contact of contacts(); track contact.id) {
+              <option [value]="contact.id">
+                {{ contact.lastName }}, {{ contact.firstName }} ({{ contact.email }})
+              </option>
+            }
+          </select>
+        }
+        @if (controlError('contactId'); as message) {
+          <p id="ownership-contact-error" class="field-error">{{ message }}</p>
+        }
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="ownership-from">Effective From</label>
+          <input
+            id="ownership-from"
+            type="date"
+            formControlName="effectiveFrom"
+            [attr.aria-invalid]="controlError('effectiveFrom') || dateRangeError() ? true : null"
+            [attr.aria-describedby]="
+              controlError('effectiveFrom') ? 'ownership-from-error' : null
+            "
+          />
+          @if (controlError('effectiveFrom'); as message) {
+            <p id="ownership-from-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="ownership-till">Effective Till (optional)</label>
+          <input
+            id="ownership-till"
+            type="date"
+            formControlName="effectiveTill"
+            [attr.aria-invalid]="dateRangeError() ? true : null"
+            [attr.aria-describedby]="dateRangeError() ? 'ownership-range-error' : null"
+          />
+          @if (dateRangeError(); as message) {
+            <p id="ownership-range-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="ownership-price">Acquisition Price</label>
+          <input
+            id="ownership-price"
+            type="number"
+            formControlName="acquisitionPrice"
+            min="0.01"
+            step="0.01"
+            [attr.aria-invalid]="controlError('acquisitionPrice') ? true : null"
+            [attr.aria-describedby]="
+              controlError('acquisitionPrice') ? 'ownership-price-error' : null
+            "
+          />
+          @if (controlError('acquisitionPrice'); as message) {
+            <p id="ownership-price-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="ownership-currency">Acquisition Currency</label>
+          <input
+            id="ownership-currency"
+            type="text"
+            formControlName="acquisitionCurrency"
+            maxlength="3"
+            class="currency-input"
+            [attr.aria-invalid]="controlError('acquisitionCurrency') ? true : null"
+            [attr.aria-describedby]="
+              controlError('acquisitionCurrency') ? 'ownership-currency-error' : null
+            "
+          />
+          @if (controlError('acquisitionCurrency'); as message) {
+            <p id="ownership-currency-error" class="field-error">{{ message }}</p>
+          }
+        </div>
+      </div>
+
+      <p class="hint">Acquisition Price USD is calculated by the backend and cannot be entered here.</p>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-button" [disabled]="saving() || contactsLoading()">
+          {{ saving() ? 'Saving…' : 'Save Ownership' }}
+        </button>
+        <button type="button" class="secondary-button" (click)="cancelForm()" [disabled]="saving()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  }
+</section>

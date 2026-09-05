@@ -16,11 +16,12 @@ import { ApiError } from '../../../core/models/problem-details';
 import { PropertyApiService } from '../../../core/services/property-api.service';
 import { applyApiFieldErrors } from '../../../shared/utils/api-form-errors';
 import { formatShortId } from '../../../shared/utils/format';
+import { PropertyOwnershipSection } from '../property-ownership-section/property-ownership-section';
 
 @Component({
   selector: 'app-property-form-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, PropertyOwnershipSection],
   templateUrl: './property-form-page.html',
   styleUrl: './property-form-page.css'
 })

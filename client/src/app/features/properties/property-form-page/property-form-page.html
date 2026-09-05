@@ -127,16 +127,13 @@
       </div>
     </form>
 
-    @if (!isCreate()) {
+    @if (!isCreate() && propertyId()) {
+      <app-property-ownership-section [propertyId]="propertyId()!" />
+
       <aside class="next-slice" aria-label="Related property features">
         <h2>Related</h2>
-        <p class="muted">
-          Ownership history and asking-price history will be available in a later slice.
-        </p>
+        <p class="muted">Asking-price history will be available in a later slice.</p>
         <ul>
-          <li>
-            <span class="placeholder-link" aria-disabled="true">Ownership history (coming soon)</span>
-          </li>
           <li>
             <span class="placeholder-link" aria-disabled="true">Price history (coming soon)</span>
           </li>

@@ -81,7 +81,7 @@ describe('DashboardPage', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('.state-empty')?.textContent).toContain(
-      'No sales or ownership history available.'
+      'No ownership acquisition events recorded yet.'
     );
   });
 

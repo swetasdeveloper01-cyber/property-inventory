@@ -1,4 +1,4 @@
-<section class="ownership-section" aria-labelledby="ownership-heading">
+<section class="ui-page ownership-section" aria-labelledby="ownership-heading">
   <header class="section-header">
     <div>
       <h2 id="ownership-heading">Ownership History</h2>
@@ -44,8 +44,8 @@
             <th scope="col">Owner</th>
             <th scope="col">From</th>
             <th scope="col">Till</th>
-            <th scope="col">Acquisition</th>
-            <th scope="col">USD</th>
+            <th scope="col" class="numeric">Acquisition</th>
+            <th scope="col" class="numeric">USD</th>
           </tr>
         </thead>
         <tbody>
@@ -60,7 +60,7 @@
                 }
               </td>
               <td>
-                <div>{{ ownerName(ownership) }}</div>
+                <div class="cell-primary">{{ ownerName(ownership) }}</div>
                 <div class="muted email">{{ ownership.ownerEmail }}</div>
               </td>
               <td>{{ formatBusinessDate(ownership.effectiveFrom) }}</td>

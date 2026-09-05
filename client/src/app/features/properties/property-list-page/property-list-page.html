@@ -1,4 +1,4 @@
-<section class="property-list">
+<section class="ui-page property-list">
   <header class="page-header">
     <div>
       <h1>Properties</h1>
@@ -52,10 +52,10 @@
         <caption class="visually-hidden">Property inventory list</caption>
         <thead>
           <tr>
-            <th scope="col">ID</th>
+            <th scope="col" class="col-id">ID</th>
             <th scope="col">Property Name</th>
             <th scope="col">Address</th>
-            <th scope="col">Price</th>
+            <th scope="col" class="numeric">Price</th>
             <th scope="col">Date of Registration</th>
             <th scope="col">Actions</th>
           </tr>
@@ -63,10 +63,16 @@
         <tbody>
           @for (property of properties(); track property.id) {
             <tr>
-              <td>
-                <code class="id-cell" [title]="property.id">{{ formatShortId(property.id) }}</code>
+              <td class="col-id">
+                <code
+                  class="id-cell"
+                  [title]="property.id"
+                  [attr.aria-label]="'Property ID ' + property.id"
+                >
+                  {{ formatShortId(property.id) }}
+                </code>
               </td>
-              <td>{{ property.name }}</td>
+              <td class="cell-primary">{{ property.name }}</td>
               <td>{{ property.address }}</td>
               <td class="numeric">{{ formatMoney(property.price, property.currency) }}</td>
               <td>{{ formatBusinessDate(property.dateOfRegistration) }}</td>

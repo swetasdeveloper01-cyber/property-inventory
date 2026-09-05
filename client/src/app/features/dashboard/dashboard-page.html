@@ -1,14 +1,15 @@
-<section class="dashboard">
-  <header class="dashboard-header">
+<section class="ui-page dashboard">
+  <header class="page-header">
     <div>
       <h1>Sales Dashboard</h1>
       <p class="lede">
-        Ownership acquisition events for each property sale or owner change.
+        Ownership acquisition events for each property sale or owner change, including asking price
+        and sold-at amounts in original currency and USD.
       </p>
     </div>
 
     @if (!loading() && !errorMessage()) {
-      <p class="summary" aria-live="polite">
+      <p class="page-meta" aria-live="polite">
         {{ sales().length }} ownership record{{ sales().length === 1 ? '' : 's' }}
       </p>
     }
@@ -27,7 +28,7 @@
     </div>
   } @else if (sales().length === 0) {
     <div class="state state-empty" role="status">
-      No sales or ownership history available.
+      No ownership acquisition events recorded yet.
     </div>
   } @else {
     <div class="table-wrap">
@@ -37,24 +38,26 @@
         </caption>
         <thead>
           <tr>
-            <th scope="col">ID</th>
+            <th scope="col" class="col-id">ID</th>
             <th scope="col">Property Name</th>
-            <th scope="col">Asking Price</th>
+            <th scope="col" class="numeric">Asking Price</th>
             <th scope="col">Owner</th>
             <th scope="col">Date of Purchase</th>
-            <th scope="col">Sold At Price</th>
-            <th scope="col">Sold At Price (USD)</th>
+            <th scope="col" class="numeric">Sold At Price</th>
+            <th scope="col" class="numeric">Sold At Price (USD)</th>
           </tr>
         </thead>
         <tbody>
           @for (item of sales(); track item.id) {
             <tr>
-              <td>
-                <code class="id-cell" [title]="item.id">{{ formatShortId(item.id) }}</code>
+              <td class="col-id">
+                <code class="id-cell" [title]="item.id" [attr.aria-label]="'Ownership ID ' + item.id">
+                  {{ formatShortId(item.id) }}
+                </code>
               </td>
-              <td>{{ item.propertyName }}</td>
+              <td class="cell-primary">{{ item.propertyName }}</td>
               <td class="numeric">{{ formatMoney(item.askingPrice, item.askingCurrency) }}</td>
-              <td>{{ item.owner }}</td>
+              <td class="cell-primary">{{ item.owner }}</td>
               <td>{{ formatBusinessDate(item.dateOfPurchase) }}</td>
               <td class="numeric">{{ formatMoney(item.soldAtPrice, item.soldAtCurrency) }}</td>
               <td class="numeric">{{ formatMoney(item.soldAtPriceUsd, 'USD') }}</td>
